@@ -1,0 +1,113 @@
+import sys
+print(sys.executable)
+
+from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.label import Label
+from kivy.uix.spinner import Spinner
+from kivy.uix.togglebutton import ToggleButton
+from kivy.uix.button import Button
+import pyautogui
+import keyboard
+
+class VopoInstalockerApp(App):
+    def build(self):
+        #main layout
+        main_layout = BoxLayout(orientation='vertical', spacing=10, padding=10)
+
+        # Resolution selection
+        resolution_label = Label(text="Select Resolution:")
+        resolutions = ['1920x1080', '1280x720', '2560x1440', '1440x1080']  # Add your desired resolutions
+        resolution_spinner = Spinner(text=resolutions[0], values=resolutions)
+
+        # Agent selection
+        agent_label = Label(text="Select Valorant Agent:")
+        agents = ['Astra', 'Breach', 'Brimstone', 'Chamber', 'Cypher', 'Jett', 'Kay/O', 'Killjoy',
+                  'Neon', 'Omen', 'Phoenix', 'Raze', 'Reyna', 'Sage', 'Skye', 'Sova', 'Viper', 'Yoru']
+        self.agent_dropdown = Spinner(text=agents[0], values=agents)
+        self.agent_dropdown.bind(on_text=self.change_agent)  # Bind the selection change event
+
+        # Hotkey selection
+        hotkey_label = Label(text="Select Hotkey:")
+        hotkeys = ['F2']  # Only F2 is allowed
+        self.hotkey_spinner = Spinner(text=hotkeys[0], values=hotkeys)
+        self.hotkey_spinner.bind(on_text=self.change_hotkey)  # Bind the selection change event
+
+        # Buttons
+        toggle_program_button = ToggleButton(text="Start/Stop Program", on_press=self.toggle_program)
+        hotkey_button = Button(text="Change Hotkey", on_press=self.change_hotkey)
+
+        # Status labels
+        self.current_agent_label = Label(text="Current Agent: " + agents[0])
+
+        # Add widgets to the main layout
+        main_layout.add_widget(resolution_label)
+        main_layout.add_widget(resolution_spinner)
+        main_layout.add_widget(agent_label)
+        main_layout.add_widget(self.agent_dropdown)
+        main_layout.add_widget(hotkey_label)
+        main_layout.add_widget(self.hotkey_spinner)
+        main_layout.add_widget(toggle_program_button)
+        main_layout.add_widget(hotkey_button)
+        main_layout.add_widget(self.current_agent_label)
+
+        # Start listening for F2 key press
+        keyboard.on_press_key('F2', self.start_program)
+
+        return main_layout
+
+    def start_program(self, e):
+        selected_agent = self.agent_dropdown.text
+        print("Selected Agent:", selected_agent)
+        print("Program started")
+        self.current_agent_label.text = "Current Agent: " + selected_agent
+        self.click_points(selected_agent)
+
+    def toggle_program(self, instance):
+        selected_agent = self.agent_dropdown.text
+        print("Selected Agent:", selected_agent)
+
+        if instance.state == 'down':
+            print("Program started")
+            self.current_agent_label.text = "Current Agent: " + selected_agent
+            self.click_points(selected_agent)
+        else:
+            print("Program stopped")
+
+    def change_agent(self, instance, value):
+        self.current_agent_label.text = "Current Agent: " + value
+
+    def change_hotkey(self, instance):
+        selected_hotkey = self.hotkey_spinner.text
+        print("Hotkey changed to:", selected_hotkey)
+
+    def click_points(self, selected_agent):
+        point_b = (695, 685)
+        agent_positions = {
+            'Astra': [(469, 764), point_b],
+            'Breach': [(908, 835), point_b],
+            'Brimstone': [(543, 767), point_b],
+            'Chamber': [(598, 776), point_b],
+            'Cypher': [(655, 760), point_b],
+            'Jett': [(846, 757), point_b],
+            'Killjoy': [(890, 760), point_b],
+            'Omen': [(954, 764), point_b],
+            'Phoenix': [(464, 836), point_b],
+            'Raze': [(529, 820), point_b],
+            'Reyna': [(599, 817), point_b],
+            'Sage': [(671, 825), point_b],
+            'Skye': [(722, 823), point_b],
+            'Sova': [(784, 809), point_b],
+            'Viper': [(840, 818), point_b],
+        }
+
+        if selected_agent in agent_positions:
+            positions = agent_positions[selected_agent]
+            for _ in range(10):  # Click 10 times
+                for position in positions:
+                    pyautogui.click(position[0], position[1])
+
+if __name__ == '__main__':
+    VopoInstalockerApp().run()
+
+
